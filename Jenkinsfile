@@ -11,7 +11,7 @@ pipeline {
             steps {
                 git branch: 'main', 
                     credentialsId: 'github-credentials', 
-                    url: 'https://github.com/vincentshedy/Boardgame.git'
+                    url: 'https://github.com/shedytech/boardgameci.git'
             }
         }
 
