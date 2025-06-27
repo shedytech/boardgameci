@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     tools {
         jdk 'jdk17'
         maven 'maven3.9.9'
@@ -14,13 +14,13 @@ pipeline {
                     url: 'https://github.com/vincentshedy/Boardgame.git'
             }
         }
-        
+
         stage('Test & Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
-        
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
@@ -28,13 +28,13 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Publish to Nexus') {
             steps {
                 sh 'mvn deploy'
             }
         }
-        
+
         stage('Build & Tag Docker Image') {
             steps {
                 script {
@@ -44,13 +44,13 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Docker Image Scan with Trivy') {
             steps {
-                sh 'trivy image --format table --scanners vuln shedyvince29/boardshack:latest'
+                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --format table --scanners vuln shedyvince29/boardshack:latest'
             }
         }
-        
+
         stage('Push Docker Image to DockerHub Registry') {
             steps {
                 script {
@@ -61,7 +61,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             echo 'Pipeline completed.'
