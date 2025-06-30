@@ -1,5 +1,15 @@
-# BoardgameListingWebApp
 
+
+## Features
+- Infrastructure: AWS EKS, EC2, VPC, S3 provisioned with Terraform.
+- Configuration: Ansible for server and app setup.
+- CI/CD: Jenkins pipeline with Maven, SonarQube, Nexus, Trivy, Docker, and Kubernetes.
+- Containerization: Docker for packaging the app.
+- Orchestration: Kubernetes (EKS) for deployment and scaling.
+- Monitoring: Prometheus and Grafana for metrics.
+- Logging: EFK (Elasticsearch, Fluentd, Kibana) for centralized logs.
+
+# BoardgameListingWebApp
 ## Description
 
 **Board Game Database Full-Stack Web Application.**
