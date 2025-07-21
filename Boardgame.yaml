@@ -1,12 +1,17 @@
 apiVersion: apps/v1
-kind: Deployment # Kubernetes resource kind we are creating
+kind: Deployment
 metadata:
   name: boardgame-deploy
+  labels:
+    app: boardgame
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
 spec:
+  replicas: 3 # Increased for higher availability
   selector:
     matchLabels:
       app: boardgame
-  replicas: 2 # Number of replicas that will be created for this deployment
   template:
     metadata:
       labels:
@@ -17,19 +22,45 @@ spec:
           image: shedyvince29/boardshack:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080 # The port that the container is running on in the cluster
-
+            - containerPort: 8080
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      restartPolicy: Always
 
 ---
-apiVersion: v1 # Kubernetes API version
-kind: Service # Kubernetes resource kind we are creating
-metadata: # Metadata of the resource kind we are creating
+apiVersion: v1
+kind: Service
+metadata:
   name: boardgame-svc
+  labels:
+    app: boardgame
 spec:
   selector:
     app: boardgame
   ports:
-    - protocol: "TCP"
-      port: 80
-      targetPort: 8080
-  type: LoadBalancer # type of the service.
+    - protocol: TCP
+      port: 80        # Exposed port
+      targetPort: 8080 # Container port
+  type: LoadBalancer
